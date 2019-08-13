@@ -44,11 +44,13 @@ CTexManager TEXMAN;
 CMatManager MATMAN;
 RenderInfo RInfo;
 /////////////////////////////
-RayTracer RTRT;
+RayTracer RTRT1;
 RayTracer RTRT2;
+RayTracer RTRT3;
+RayTracer RTRT4;
 /////////////////////////////
 void (*pFunc)(void*);
-HANDLE hRender;
+HANDLE hRender1, hRender2, hRender3;
 
 Model *pModel;
 
@@ -146,10 +148,14 @@ void InitGraphics(HWND hWnd, int width, int height)
 	//Rect.LoadMesh(VertexList, IndexList, 16, 36);
 
 	
-	RTRT.Setup();
+	RTRT1.Setup();
 	RTRT2.Setup();
-	hRender = CreateEvent(NULL,TRUE,TRUE,"RENDER");
-	
+	RTRT3.Setup();
+	RTRT4.Setup();
+	hRender1 = CreateEvent(NULL,TRUE,TRUE,"RENDER1");
+	hRender2 = CreateEvent(NULL, TRUE, TRUE, "RENDER2");
+	hRender3 = CreateEvent(NULL, TRUE, TRUE, "RENDER3");
+
 	QueryPerformanceFrequency(&Frequency);
 
 	g_bIsActive = TRUE;
@@ -205,12 +211,26 @@ L0:		movq	[edi], mm0
 */
 }
 
-void RenderCall(void* p)
+void RenderCall1(void* p)
 {
 	//ResetEvent(hRender);
 	int scan = *(int*)p;
-	RTRT.Render(scan);
-	SetEvent(hRender);
+	RTRT1.Render(0);
+	SetEvent(hRender1);
+}
+void RenderCall2(void* p)
+{
+	//ResetEvent(hRender);
+	int scan = *(int*)p;
+	RTRT2.Render(1);
+	SetEvent(hRender2);
+}
+void RenderCall3(void* p)
+{
+	//ResetEvent(hRender);
+	int scan = *(int*)p;
+	RTRT3.Render(2);
+	SetEvent(hRender3);
 }
 
 void UpdateFrame(void)
@@ -293,16 +313,26 @@ void UpdateFrame(void)
 		pModel->Render();
 	}
 
-	RTRT.Move();
+	RTRT1.Move();
 	RTRT2.Move();
+	RTRT3.Move();
+	RTRT4.Move();
 
-	ResetEvent(hRender);
+	ResetEvent(hRender1);
+	ResetEvent(hRender2);
+	ResetEvent(hRender3);
 	int start = 0;
-	_beginthread(RenderCall, 0, (void*) &start);
-	
-	RTRT2.Render(1);
+	_beginthread(RenderCall1, 0, (void*)&start);
+	start = 1;
+	_beginthread(RenderCall2, 0, (void*)&start);
+	start = 2;
+	_beginthread(RenderCall3, 0, (void*)&start);
 
-	WaitForSingleObject(hRender, INFINITE);
+	RTRT4.Render(3);
+
+	WaitForSingleObject(hRender1, INFINITE);
+	WaitForSingleObject(hRender2, INFINITE);
+	WaitForSingleObject(hRender3, INFINITE);
 
 	DisplayFPS();
 	//RInfo.Display(0, 340);

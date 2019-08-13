@@ -13,7 +13,7 @@ Soft3DApp g_Soft3DApp;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    if( FAILED( g_Soft3DApp.Create(hInstance, 512, 384) ) )
+    if( FAILED( g_Soft3DApp.Create(hInstance, 640, 480) ) )
         return 0;
 	
 	return g_Soft3DApp.Run();

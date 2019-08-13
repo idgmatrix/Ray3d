@@ -7,8 +7,8 @@
 #include "primitive.h"
 #include "scene.h"
 
-#define SCREEN_WIDTH	512
-#define SCREEN_HEIGHT	384
+#define SCREEN_WIDTH	640
+#define SCREEN_HEIGHT	480
 
 #define MAX_GEOM 4
 #define SCENE_CENTER 350
@@ -214,9 +214,9 @@ void RayTracer::Render(int scan)
 	//float t[MAX_GEOM];
 	int index = 0;
 	
-	if (scan%2) offset = BytesPerScanline;
-	else {offset = 0;}
-	for (int y = scan; y < SCREEN_HEIGHT; y+= 2)
+	offset = BytesPerScanline * scan;
+
+	for (int y = scan; y < SCREEN_HEIGHT; y+= 4)
 	{
 		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
@@ -306,19 +306,37 @@ DRAWPIXEL:
 			BYTE B,G,R;
 			BYTE color = BYTE(Intensity * 255);
 
-/*			if (y % 2)
-			{
-				B = 0;
-				G = color;
-				R = 0;
-			}
-			else
-			{
+/*
+			switch (scan) {
+			case 0:
 				B = 0;
 				G = 0;
 				R = color;
+				break;
+
+			case 1:
+				B = 0;
+				G = color;
+				R = 0;
+
+				break;
+
+			case 2:
+				B = color;
+				G = 0;
+				R = 0;
+
+				break;
+
+			case 3:
+				B = 0;
+				G = color;
+				R = color;
+
+				break;
 			}
-*/			
+*/
+
 			B = color;
 			G = color;
 			R = color;
@@ -331,6 +349,6 @@ DRAWPIXEL:
 			offset += 2;
 			
 		}
-		offset += BytesPerScanline;
+		offset += BytesPerScanline * 3;
 	}
 }
