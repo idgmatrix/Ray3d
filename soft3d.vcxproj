@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectName>Ray3d</ProjectName>
     <ProjectGuid>{7BFF0F05-4330-410F-AF25-635DD0915D32}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -127,7 +127,6 @@
       <Culture>0x0412</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\Debug/soft3d.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/soft3d.pdb</ProgramDatabaseFile>
