@@ -12,7 +12,8 @@ class RayTracer {
 	Vector3 vLightPosition;
 	//int Offset;
 	float theta;
-	int current_index;
+	int current_index[4];
+
 public:
 	void Setup();
 	void Move(void);

@@ -26,6 +26,8 @@
 
 #include "raytracer.h"
 #include "process.h"
+#include <thread>
+using std::thread;
 
 #ifdef _MSC_VER
 #define _CW_DEFAULT ( _RC_NEAR + _PC_53 + _EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW + _EM_UNDERFLOW + _EM_INEXACT + _EM_DENORMAL)
@@ -43,14 +45,8 @@ CDIBSection FrameBuffer;
 CTexManager TEXMAN;
 CMatManager MATMAN;
 RenderInfo RInfo;
-/////////////////////////////
-RayTracer RTRT1;
-RayTracer RTRT2;
-RayTracer RTRT3;
-RayTracer RTRT4;
-/////////////////////////////
-void (*pFunc)(void*);
-HANDLE hRender1, hRender2, hRender3;
+
+RayTracer RTRT;
 
 Model *pModel;
 
@@ -147,14 +143,7 @@ void InitGraphics(HWND hWnd, int width, int height)
 	//////////////////////////////////////////////
 	//Rect.LoadMesh(VertexList, IndexList, 16, 36);
 
-	
-	RTRT1.Setup();
-	RTRT2.Setup();
-	RTRT3.Setup();
-	RTRT4.Setup();
-	hRender1 = CreateEvent(NULL,TRUE,TRUE,"RENDER1");
-	hRender2 = CreateEvent(NULL, TRUE, TRUE, "RENDER2");
-	hRender3 = CreateEvent(NULL, TRUE, TRUE, "RENDER3");
+	RTRT.Setup();
 
 	QueryPerformanceFrequency(&Frequency);
 
@@ -211,26 +200,19 @@ L0:		movq	[edi], mm0
 */
 }
 
-void RenderCall1(void* p)
+void RenderCall0()
 {
-	//ResetEvent(hRender);
-	int scan = *(int*)p;
-	RTRT1.Render(0);
-	SetEvent(hRender1);
+	RTRT.Render(0);
 }
-void RenderCall2(void* p)
+
+void RenderCall1()
 {
-	//ResetEvent(hRender);
-	int scan = *(int*)p;
-	RTRT2.Render(1);
-	SetEvent(hRender2);
+	RTRT.Render(1);
 }
-void RenderCall3(void* p)
+
+void RenderCall2()
 {
-	//ResetEvent(hRender);
-	int scan = *(int*)p;
-	RTRT3.Render(2);
-	SetEvent(hRender3);
+	RTRT.Render(2);
 }
 
 void UpdateFrame(void)
@@ -310,29 +292,20 @@ void UpdateFrame(void)
 
 	if (g_bIsASE)
 	{
-		pModel->Render();
+		//pModel->Render();
 	}
 
-	RTRT1.Move();
-	RTRT2.Move();
-	RTRT3.Move();
-	RTRT4.Move();
+	RTRT.Move();
 
-	ResetEvent(hRender1);
-	ResetEvent(hRender2);
-	ResetEvent(hRender3);
-	int start = 0;
-	_beginthread(RenderCall1, 0, (void*)&start);
-	start = 1;
-	_beginthread(RenderCall2, 0, (void*)&start);
-	start = 2;
-	_beginthread(RenderCall3, 0, (void*)&start);
+	thread t0(RenderCall0);
+	thread t1(RenderCall1);
+	thread t2(RenderCall2);
 
-	RTRT4.Render(3);
+	RTRT.Render(3);
 
-	WaitForSingleObject(hRender1, INFINITE);
-	WaitForSingleObject(hRender2, INFINITE);
-	WaitForSingleObject(hRender3, INFINITE);
+	t0.join();
+	t1.join();
+	t2.join();
 
 	DisplayFPS();
 	//RInfo.Display(0, 340);

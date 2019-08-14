@@ -129,7 +129,7 @@ LRESULT Soft3DApp::AppProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				case IDC_ABOUT:
 					MessageBox(hWnd, 
-					"g-Matrix3d Ray v0.50\n\n(c)2008 Kim Seong Wan(kaswan)  \n\n\tidgmatrix@gmail.com\n\thttps://github.com/idgmatrix/Ray3d",
+					"g-Matrix3d Ray v0.60\n\n(c)2008, 2019 Kim Seong Wan(kaswan)  \n\n\tidgmatrix@gmail.com\n\thttps://github.com/idgmatrix/Ray3d",
 					"About Ray3d", MB_OK);
 					return 0;
 

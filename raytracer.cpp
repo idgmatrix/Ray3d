@@ -139,6 +139,7 @@ float RayTracer::RayTrace(const Ray& ray, Vector3* pInterPos, Vector3* pNormal)
 	//int index;
 	float Intensity = 0.0f;
 	float t[MAX_GEOM];
+	int current_index;
 	
 	Ray eray = ray;
 	eray.startp += ray.dir * EPSILON * 2;
@@ -204,7 +205,7 @@ float RayTracer::RayTrace(const Ray& ray, Vector3* pInterPos, Vector3* pNormal)
 }
 
 
-void RayTracer::Render(int scan)
+void RayTracer::Render(int thread_no)
 {
 	Vector3 vRay, vPoint;
 	Vector3 InterPos, vNormal, vLight;
@@ -214,9 +215,9 @@ void RayTracer::Render(int scan)
 	//float t[MAX_GEOM];
 	int index = 0;
 	
-	offset = BytesPerScanline * scan;
+	offset = BytesPerScanline * thread_no;
 
-	for (int y = scan; y < SCREEN_HEIGHT; y+= 4)
+	for (int y = thread_no; y < SCREEN_HEIGHT; y+= 4)
 	{
 		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
@@ -239,7 +240,7 @@ void RayTracer::Render(int scan)
 			float R_Factor = 0.4f;
 
 			if (true) {
-			//if ( current_index != 0) {
+			//if ( current_index[thread_no] != 0) {
 				Vector3 vReflect = vNormal * (-ViewRay.dir * vNormal) * 2  + ViewRay.dir;
 				
 				Ray R_ray(InterPos, vReflect);
@@ -247,18 +248,18 @@ void RayTracer::Render(int scan)
 				if (intensity < 0.0f) {goto DRAWPIXEL;}
 				Intensity += intensity * R_Factor;
 				
-				//Vector3 vReflect2 = vNormal * (-R_ray.dir * vNormal) * 2  + R_ray.dir;
+				Vector3 vReflect2 = vNormal * (-R_ray.dir * vNormal) * 2  + R_ray.dir;
 				
-				//intensity = RayTrace(Ray(InterPos, vReflect2), &InterPos, &vNormal); 
-				//if (intensity < 0.0f) {goto DRAWPIXEL;}
-				//Intensity += intensity * R_Factor;
+				intensity = RayTrace(Ray(InterPos, vReflect2), &InterPos, &vNormal); 
+				if (intensity < 0.0f) {goto DRAWPIXEL;}
+				Intensity += intensity * R_Factor;
 			}
 		
 			//////////////////////////////
 			///  Refraction
 			float T_Factor = 0.9f;
 			if ( false ) {
-			//if ( current_index == 0) {
+			//if ( current_index[thread_no] == 0) {
 				float n = 1.0f / 1.5f;
 				float cosI = ViewRay.dir * vNormal;
 				float sinT2 = n * n * (1.0f - cosI * cosI);
@@ -268,9 +269,9 @@ void RayTracer::Render(int scan)
 				
 				T_ray.startp += vRefract * EPSILON; ////////// 
 				//T_ray.dir = ViewRay.dir;
-				float t = pGeom[current_index]->FindInnerIntersection(T_ray);
-				Vector3 T_pos = pGeom[current_index]->GetIntersectionPos(t, T_ray);
-				Vector3 T_normal = -(pGeom[current_index]->GetNormalAtPos(T_pos));
+				float t = pGeom[current_index[thread_no]]->FindInnerIntersection(T_ray);
+				Vector3 T_pos = pGeom[current_index[thread_no]]->GetIntersectionPos(t, T_ray);
+				Vector3 T_normal = -(pGeom[current_index[thread_no]]->GetNormalAtPos(T_pos));
 
 				n = 1.0f / 1.0f;
 				cosI = T_ray.dir * T_normal;
@@ -307,7 +308,7 @@ DRAWPIXEL:
 			BYTE color = BYTE(Intensity * 255);
 
 /*
-			switch (scan) {
+			switch (thread_no) {
 			case 0:
 				B = 0;
 				G = 0;
