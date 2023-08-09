@@ -6,4 +6,4 @@
 - build by Visual Studio 2019
 
 ## screen shot
-![Ray3d](ray3d.png)
+![Ray3d](ray3d-2.png)
