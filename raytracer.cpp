@@ -17,8 +17,10 @@ Sphere sph[3];
 Plane pln[2];
 
 
-void RayTracer::Setup(void)
+void RayTracer::Setup(int max_threads)
 {
+	this->max_threads = max_threads;
+	
 	sph[0].center = Vector3(0, 0, SCENE_CENTER);
 	sph[0].R = 100.0f;
 
@@ -217,7 +219,7 @@ void RayTracer::Render(int thread_no)
 	
 	offset = BytesPerScanline * thread_no;
 
-	for (int y = thread_no; y < SCREEN_HEIGHT; y+= 4)
+	for (int y = thread_no; y < SCREEN_HEIGHT; y+= max_threads)
 	{
 		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
@@ -350,6 +352,6 @@ DRAWPIXEL:
 			offset += 2;
 			
 		}
-		offset += BytesPerScanline * 3;
+		offset += BytesPerScanline * (max_threads - 1);
 	}
 }

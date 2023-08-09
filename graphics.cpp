@@ -27,7 +27,9 @@
 #include "raytracer.h"
 #include "process.h"
 #include <thread>
+#include <vector>
 using std::thread;
+using std::vector;
 
 #ifdef _MSC_VER
 #define _CW_DEFAULT ( _RC_NEAR + _PC_53 + _EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW + _EM_UNDERFLOW + _EM_INEXACT + _EM_DENORMAL)
@@ -47,6 +49,7 @@ CMatManager MATMAN;
 RenderInfo RInfo;
 
 RayTracer RTRT;
+vector<thread> workers;
 
 Model *pModel;
 
@@ -113,6 +116,12 @@ void PutNumber(int x, int y, char* text, UINT number);
 void PutNumber(int x, int y, char* text, float number);
 void PutNumberHex(int x, int y, char* text, int number);
 void ResetFrameCounter(void);
+void SetNumThreads(int num){
+	RTRT.SetNumThreads(num);
+}
+int GetNumThreads(void) {
+	return RTRT.GetNumThreads();
+}
 
 void SetColor(BYTE r, BYTE g, BYTE b);
 
@@ -143,7 +152,7 @@ void InitGraphics(HWND hWnd, int width, int height)
 	//////////////////////////////////////////////
 	//Rect.LoadMesh(VertexList, IndexList, 16, 36);
 
-	RTRT.Setup();
+	RTRT.Setup(4);
 
 	QueryPerformanceFrequency(&Frequency);
 
@@ -200,19 +209,9 @@ L0:		movq	[edi], mm0
 */
 }
 
-void RenderCall0()
+void RenderCall(int index)
 {
-	RTRT.Render(0);
-}
-
-void RenderCall1()
-{
-	RTRT.Render(1);
-}
-
-void RenderCall2()
-{
-	RTRT.Render(2);
+	RTRT.Render(index);
 }
 
 void UpdateFrame(void)
@@ -220,7 +219,10 @@ void UpdateFrame(void)
 	static float frametime;
 	static Vector3 camera;
 	static float FOV = 90;
+	static int max_threads;
 	frameCounter++;
+
+	max_threads = RTRT.GetNumThreads();
 
 	// Clear fame buffer and depth buffer
 	FrameBuffer.Clear(10, 10, 10);
@@ -297,16 +299,34 @@ void UpdateFrame(void)
 
 	RTRT.Move();
 
-	thread t0(RenderCall0);
-	thread t1(RenderCall1);
-	thread t2(RenderCall2);
+	for (int i = 0; i < max_threads; i++){
+		workers.push_back(thread(RenderCall, i));
+	}
+	
+	for (int i = 0; i < max_threads; i++) {
+		workers[i].join();
+	}
 
-	RTRT.Render(3);
+	workers.clear();
+/*
+	thread t0(RenderCall, 0);
+	thread t1(RenderCall, 1);
+	thread t2(RenderCall, 2);
+	thread t3(RenderCall, 3);
+	thread t4(RenderCall, 4);
+	thread t5(RenderCall, 5);
+	thread t6(RenderCall, 6);
+	thread t7(RenderCall, 7);
 
 	t0.join();
 	t1.join();
 	t2.join();
-
+	t3.join();
+	t4.join();
+	t5.join();
+	t6.join();
+	t7.join();
+*/
 	DisplayFPS();
 	//RInfo.Display(0, 340);
 	//RInfo.Clear();

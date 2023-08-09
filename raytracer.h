@@ -13,9 +13,12 @@ class RayTracer {
 	//int Offset;
 	float theta;
 	int current_index[4];
+	int max_threads;
 
 public:
-	void Setup();
+	void Setup(int max_threads);
+	void SetNumThreads(int num) { max_threads = num; }
+	int GetNumThreads(void) { return max_threads; }
 	void Move(void);
 	void Render(int scan);
 	float RayTrace(const Ray& ray, Vector3* pInterPos, Vector3* pNormal);

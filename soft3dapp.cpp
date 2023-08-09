@@ -8,7 +8,7 @@
 *******************************************************/
 #include "stdafx.h"
 #include "soft3dapp.h"
-#include "soft3dres.h"
+#include "resource.h"
 #include "graphics.h"
 
 static Soft3DApp* g_pSoft3DApp = NULL;
@@ -106,12 +106,15 @@ int Soft3DApp::Run()
 	return msg.wParam;
 }
 
+
+
 LRESULT Soft3DApp::AppProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	//RECT rect;
 	// Mouse
 	short int xPos, yPos;
 	static bool bMouseOn = false;
+	static int numThreads;
 
 	switch (uMsg)
 	{
@@ -129,7 +132,7 @@ LRESULT Soft3DApp::AppProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				case IDC_ABOUT:
 					MessageBox(hWnd, 
-					"g-Matrix3d Ray v0.60\n\n(c)2008, 2019 Kim Seong Wan(kaswan)  \n\n\tidgmatrix@gmail.com\n\thttps://github.com/idgmatrix/Ray3d",
+					"g-Matrix3d Ray v0.60\n\n(c)2008, 2019, 2023 Kim Seong Wan(kaswan)  \n\n\tidgmatrix@gmail.com\n\thttps://github.com/idgmatrix/Ray3d",
 					"About Ray3d", MB_OK);
 					return 0;
 
@@ -140,6 +143,29 @@ LRESULT Soft3DApp::AppProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case IDC_EXIT:
 					DeinitGraphics(hWnd);
 					PostQuitMessage(0);
+					return 0;
+
+				case ID_THREADS_1THREAD:
+				case ID_THREADS_2THREADS:
+				case ID_THREADS_3THREADS:
+				case ID_THREADS_4THREADS:
+				case ID_THREADS_5THREADS:
+				case ID_THREADS_6THREADS:
+				case ID_THREADS_7THREADS:
+				case ID_THREADS_8THREADS:
+				case ID_THREADS_9THREADS:
+				case ID_THREADS_10THREADS:
+				case ID_THREADS_11THREADS:
+				case ID_THREADS_12THREADS:
+				case ID_THREADS_13THREADS:
+				case ID_THREADS_14THREADS:
+				case ID_THREADS_15THREADS:
+				case ID_THREADS_16THREADS:
+					numThreads = GetNumThreads();
+					CheckMenuItem(GetMenu(hWnd), ID_THREADS_1THREAD + numThreads - 1, MF_UNCHECKED);
+					numThreads = LOWORD(wParam) - ID_THREADS_1THREAD + 1;
+					SetNumThreads(numThreads);
+					CheckMenuItem(GetMenu(hWnd), ID_THREADS_1THREAD + numThreads - 1, MF_CHECKED);
 					return 0;
 			}
 			break;

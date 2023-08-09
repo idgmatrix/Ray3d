@@ -36,6 +36,8 @@ void	PutNumber(int x, int y, char* text, UINT number);
 void	PutNumber(int x, int y, char* text, float number);
 void	PutNumberHex(int x, int y, char* text, int number);
 void	ResetFrameCounter(void);
+void	SetNumThreads(int num);
+int		GetNumThreads(void);
 
 void OnPicking(int mx, int my);
 void OnMouseLButtonDown(int mx, int my);
