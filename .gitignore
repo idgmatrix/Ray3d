@@ -19,3 +19,6 @@ Debug/soft3d.exe
 .vs/Ray3d/v16/.suo
 Debug/soft3d.vcxproj.FileListAbsolute.txt
 Release/soft3d.vcxproj.FileListAbsolute.txt
+*.db-shm
+*.db-wal
+*.recipe
