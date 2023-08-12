@@ -22,3 +22,4 @@ Release/soft3d.vcxproj.FileListAbsolute.txt
 *.db-shm
 *.db-wal
 *.recipe
+/.vs/Ray3d
